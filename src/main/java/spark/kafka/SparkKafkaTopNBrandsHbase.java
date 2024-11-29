@@ -50,7 +50,6 @@ public class SparkKafkaTopNBrandsHbase {
                 .option("kafka.group.id", groupId)
                 .load();
 
-        // Extract brand from the CSV data and count occurrences
         Dataset<Row> brandCounts = df.selectExpr("CAST(value AS STRING)")
                 .as(Encoders.STRING())
                 .flatMap((FlatMapFunction<String, String>) value -> {
@@ -58,16 +57,7 @@ public class SparkKafkaTopNBrandsHbase {
                     return Arrays.asList(parts[5]).iterator(); // Assuming brand is the 6th column
                 }, Encoders.STRING())
                 .groupBy("value").count();
-
-        // Output top N brands to console
-        /*
-        * StreamingQuery query = brandCounts.orderBy(functions.col("count").desc())
-                .limit(topN)
-                .writeStream()
-                .outputMode("complete")
-                .format("console")
-                .start();
-                * */
+      
         // Define HBase configuration
         Configuration hbaseConfig = HBaseConfiguration.create();
         System.out.println("started !!!!!!!");
@@ -139,7 +129,6 @@ public class SparkKafkaTopNBrandsHbase {
 
         // Await termination
 
-      //  query.awaitTermination();
         hbaseQuery.awaitTermination();
     }
 
